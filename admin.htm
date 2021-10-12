@@ -15,20 +15,49 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log(str);
     str = b64_to_utf8(str);
     console.log(str);
-    window.location.href = str;
+    //document.write (str);
+
 }, false);
+
+function calc()
+{
+    //  Generate redirect-code from user input
+
+    //  Get target URL from user input
+    target_url = document.getElementById("target_url").value;
+    console.log(target_url);
+    //  Convert URL to save format
+    //target_url = encodeURI(target_url)
+    console.log(target_url);
+    //  Create object with target url
+    target_obj = {"url":  target_url}
+    console.log(target_obj);
+    target_json_str = JSON.stringify(target_obj);
+    // json_str = '{"url":"http://brva.ru/wiki5?123=Приветули🥳"}';
+    console.log(target_json_str);
+    //  Convert to base64
+    // target_json_b64_str = utf8_to_b64(target_json_str);
+    target_json_b64_str = window.btoa(target_json_str);
+
+    console.log(target_json_b64_str);
+
+    full_result_url = 'http://brva.ru/7/?'+target_json_b64_str;
+    document.getElementById("result_url").value = target_json_b64_str;
+    document.getElementById("target_href").href = full_result_url
+    document.getElementById("target_href").innerHTML = full_result_url
+}
 </script>
 
 
 <style type="text/css">
-body
+*
 {
     margin:.5em auto;
     padding:.5em;
     text-align:left;
     font-family:sans;
-    color:#000;
-    background-color:#FFF;
+    color:#080;
+    background-color:#000;
 }
  @media print
  {
@@ -43,10 +72,29 @@ body
     }
 }
 
+.fullwidth
+{
+width:99.4%;
+}
+
+
 </style>
 </head>
 <body>
+URL
+<textarea id="target_url" name="target_url" class="fullwidth" rows="1" cols="33">
+https://ru.wikipedia.org/wiki/%D0%9F%D1%80%D0%B8%D0%B2%D0%B5%D1%82%D1%81%D1%82%D0%B2%D0%B8%D0%B5
+</textarea>
+<br>
 
+<input type="submit" value="Create" onclick="calc();">
+<br>
+
+<textarea id="result_url" name="result_url" class="fullwidth" rows="1" cols="33">
+</textarea>
+<br>
+
+<a id=target_href target=_blank></a>
 
 </body>
 </html>
