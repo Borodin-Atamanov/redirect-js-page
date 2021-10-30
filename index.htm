@@ -2,6 +2,22 @@
 <!-- TODO: add beautiful icon -->
 
 <script>
+function b64ToUint6 (nChr)
+{
+  return nChr > 64 && nChr < 91 ?
+      nChr - 65
+    : nChr > 96 && nChr < 123 ?
+      nChr - 71
+    : nChr > 47 && nChr < 58 ?
+      nChr + 4
+    : nChr === 43 ?
+      62
+    : nChr === 47 ?
+      63
+    :
+      0;
+}
+
 function get_query_params(qs)
 {
     /*  function decode parameters from GET
@@ -30,7 +46,6 @@ function base64url_to_b64 (base64)
 }
 
 function base64DecToArr (sBase64, nBlocksSize) {
-
   var
     sB64Enc = sBase64.replace(/[^A-Za-z0-9\+\/]/g, ""), nInLen = sB64Enc.length,
     nOutLen = nBlocksSize ? Math.ceil((nInLen * 3 + 1 >> 2) / nBlocksSize) * nBlocksSize : nInLen * 3 + 1 >> 2, taBytes = new Uint8Array(nOutLen);
@@ -50,12 +65,41 @@ function base64DecToArr (sBase64, nBlocksSize) {
   return taBytes;
 }
 
-function UTF8ArrToStr (aBytes) {
+function xor_decode (buffarr8bit)
+{
+    //  get control byte from zero element
+    old_xor = buffarr8bit[0];
 
+    decoded_buffarray = new Uint8Array(buffarr8bit.length-1);
+
+    //  Decode all bytes with one byte checksum, using XOR, start from second element!
+    for (i = 0; i < decoded_buffarray.length; i++)
+    {
+        decoded_buffarray[i] = old_xor ^ buffarr8bit[i+1];
+    }
+
+    //  check validity of output array.
+    new_xor = 0;
+    for (i = 0; i < decoded_buffarray.length; i++)
+    {
+        // calculate checksum for all bytes in the input string
+        new_xor = new_xor ^ decoded_buffarray[i];
+    }
+
+    console.log('old_xor='+old_xor+' new_xor: '+new_xor);
+    console.log('decoded_buffarray='+decoded_buffarray+'  ');
+    //  encoded decoded bufferarray
+    if (old_xor == new_xor) return decoded_buffarray;
+
+    //  Return false if data corrupted
+    return false;
+}
+
+function UTF8ArrToStr (aBytes)
+{
   var sView = "";
 
-  for (var nPart, nLen = aBytes.length, nIdx = 0; nIdx < nLen; nIdx++)
-  {
+  for (var nPart, nLen = aBytes.length, nIdx = 0; nIdx < nLen; nIdx++) {
     nPart = aBytes[nIdx];
     sView += String.fromCharCode(
       nPart > 251 && nPart < 254 && nIdx + 5 < nLen ? /* six bytes */
@@ -77,40 +121,6 @@ function UTF8ArrToStr (aBytes) {
   return sView;
 }
 
-function b64ToUint6 (nChr) {
-
-  return nChr > 64 && nChr < 91 ?
-      nChr - 65
-    : nChr > 96 && nChr < 123 ?
-      nChr - 71
-    : nChr > 47 && nChr < 58 ?
-      nChr + 4
-    : nChr === 43 ?
-      62
-    : nChr === 47 ?
-      63
-    :
-      0;
-
-}
-
-
-function xor_decode (buffarr8bit)
-{
-    //  get control byte from zero element
-    all_xor = buffarr8bit[0];
-
-    decoded_buffarray = new Uint8Array(buffarr8bit.length-1);
-
-    //  Decode all bytes with one byte checksum, using XOR, start from second element!
-    for (i = 0; i < decoded_buffarray.length; i++)
-    {
-        decoded_buffarray[i] = all_xor ^ buffarr8bit[i+1];
-    }
-
-    //  encoded bufferarray
-    return decoded_buffarray;
-}
 
 document.addEventListener('DOMContentLoaded', function() {
     // Get string from GET-request
@@ -124,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var url = UTF8ArrToStr(decoded_buffarray);
     console.log('url ' + url);
 
-    // document.write('<a target="_blank" href="'+target_obj.url+'">'+target_obj.url+'</a>');
+    document.write('<a target="_blank" href="'+url+'">'+url+'</a>');
     // TODO: handle redirect errors here
     window.location.replace(url);
     window.location.href = url;
