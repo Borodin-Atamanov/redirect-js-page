@@ -54,7 +54,8 @@ function UTF8ArrToStr (aBytes) {
 
   var sView = "";
 
-  for (var nPart, nLen = aBytes.length, nIdx = 0; nIdx < nLen; nIdx++) {
+  for (var nPart, nLen = aBytes.length, nIdx = 0; nIdx < nLen; nIdx++)
+  {
     nPart = aBytes[nIdx];
     sView += String.fromCharCode(
       nPart > 251 && nPart < 254 && nIdx + 5 < nLen ? /* six bytes */
@@ -111,7 +112,6 @@ function xor_decode (buffarr8bit)
     return decoded_buffarray;
 }
 
-
 document.addEventListener('DOMContentLoaded', function() {
     // Get string from GET-request
     var query = get_query_params(document.location.search);
@@ -126,8 +126,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // document.write('<a target="_blank" href="'+target_obj.url+'">'+target_obj.url+'</a>');
     // TODO: handle redirect errors here
-    // window.location.replace(target_obj.url);
-    //window.location.href = target_obj.url;
+    window.location.replace(url);
+    window.location.href = url;
 
 }, false);
 
