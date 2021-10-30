@@ -204,9 +204,26 @@ function calc()
 
     // target_b64_str = window.btoa(target_url);
 
+    //  Add char to the start of url
+    target_url = '_' + target_url;
+
     //  TODO: convert any string to safe format
     var aMyUTF8Input = strToUTF8Arr(target_url);
     console.log(aMyUTF8Input);
+
+    // aMyUTF8Input[0] = 42;
+
+    let all_xor = 0;
+    for (let i = 0; i < aMyUTF8Input.length; i++)
+    {
+        console.log(aMyUTF8Input[i]);
+        all_xor = all_xor ^ aMyUTF8Input[i];
+    }
+    console.log('all_xor: ' + all_xor);
+    //  Set first byte to checksum
+    aMyUTF8Input[0] = all_xor;
+    console.log(' ' + aMyUTF8Input);
+
     var sMyBase64 = base64EncArr(aMyUTF8Input);
     target_b64_str = sMyBase64;
 
@@ -223,7 +240,6 @@ function calc()
     var aMyUTF8Output = base64DecToArr(sMyBase64);
     var sMyOutput = UTF8ArrToStr(aMyUTF8Output);
     */
-
 }
 </script>
 
