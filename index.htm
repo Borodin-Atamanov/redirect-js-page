@@ -2,35 +2,131 @@
 <!-- TODO: add beautiful icon -->
 
 <script>
-function utf8_to_b64( str ) {
-  return window.btoa(unescape(encodeURIComponent( str )));
+function get_query_params(qs)
+{
+    /*  function decode parameters from GET
+    */
+    qs = qs.split('+').join(' ');
+
+    var params = {},
+        tokens,
+        re = /[?&]?([^=]+)=([^&]*)/g;
+
+    while (tokens = re.exec(qs))
+    {
+        params[decodeURIComponent(tokens[1])] = decodeURIComponent(tokens[2]);
+    }
+
+    return params;
 }
 
-function b64_to_utf8( str ) {
-  return decodeURIComponent(escape(window.atob( str )));
+function base64url_to_b64 (base64)
+{
+    //  Convert string from base64url format to normal base64 format
+    base64 = base64.replaceAll('-','+');
+    base64 = base64.replaceAll('_','/');
+    base64 = base64.replaceAll('.','=');
+    return base64;
 }
+
+function base64DecToArr (sBase64, nBlocksSize) {
+
+  var
+    sB64Enc = sBase64.replace(/[^A-Za-z0-9\+\/]/g, ""), nInLen = sB64Enc.length,
+    nOutLen = nBlocksSize ? Math.ceil((nInLen * 3 + 1 >> 2) / nBlocksSize) * nBlocksSize : nInLen * 3 + 1 >> 2, taBytes = new Uint8Array(nOutLen);
+
+  for (var nMod3, nMod4, nUint24 = 0, nOutIdx = 0, nInIdx = 0; nInIdx < nInLen; nInIdx++) {
+    nMod4 = nInIdx & 3;
+    nUint24 |= b64ToUint6(sB64Enc.charCodeAt(nInIdx)) << 6 * (3 - nMod4);
+    if (nMod4 === 3 || nInLen - nInIdx === 1) {
+      for (nMod3 = 0; nMod3 < 3 && nOutIdx < nOutLen; nMod3++, nOutIdx++) {
+        taBytes[nOutIdx] = nUint24 >>> (16 >>> nMod3 & 24) & 255;
+      }
+      nUint24 = 0;
+
+    }
+  }
+
+  return taBytes;
+}
+
+function UTF8ArrToStr (aBytes) {
+
+  var sView = "";
+
+  for (var nPart, nLen = aBytes.length, nIdx = 0; nIdx < nLen; nIdx++) {
+    nPart = aBytes[nIdx];
+    sView += String.fromCharCode(
+      nPart > 251 && nPart < 254 && nIdx + 5 < nLen ? /* six bytes */
+        /* (nPart - 252 << 30) may be not so safe in ECMAScript! So...: */
+        (nPart - 252) * 1073741824 + (aBytes[++nIdx] - 128 << 24) + (aBytes[++nIdx] - 128 << 18) + (aBytes[++nIdx] - 128 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
+      : nPart > 247 && nPart < 252 && nIdx + 4 < nLen ? /* five bytes */
+        (nPart - 248 << 24) + (aBytes[++nIdx] - 128 << 18) + (aBytes[++nIdx] - 128 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
+      : nPart > 239 && nPart < 248 && nIdx + 3 < nLen ? /* four bytes */
+        (nPart - 240 << 18) + (aBytes[++nIdx] - 128 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
+      : nPart > 223 && nPart < 240 && nIdx + 2 < nLen ? /* three bytes */
+        (nPart - 224 << 12) + (aBytes[++nIdx] - 128 << 6) + aBytes[++nIdx] - 128
+      : nPart > 191 && nPart < 224 && nIdx + 1 < nLen ? /* two bytes */
+        (nPart - 192 << 6) + aBytes[++nIdx] - 128
+      : /* nPart < 127 ? */ /* one byte */
+        nPart
+    );
+  }
+
+  return sView;
+}
+
+function b64ToUint6 (nChr) {
+
+  return nChr > 64 && nChr < 91 ?
+      nChr - 65
+    : nChr > 96 && nChr < 123 ?
+      nChr - 71
+    : nChr > 47 && nChr < 58 ?
+      nChr + 4
+    : nChr === 43 ?
+      62
+    : nChr === 47 ?
+      63
+    :
+      0;
+
+}
+
+
+function xor_decode (buffarr8bit)
+{
+    //  get control byte from zero element
+    all_xor = buffarr8bit[0];
+
+    decoded_buffarray = new Uint8Array(buffarr8bit.length-1);
+
+    //  Decode all bytes with one byte checksum, using XOR, start from second element!
+    for (i = 0; i < decoded_buffarray.length; i++)
+    {
+        decoded_buffarray[i] = all_xor ^ buffarr8bit[i+1];
+    }
+
+    //  encoded bufferarray
+    return decoded_buffarray;
+}
+
 
 document.addEventListener('DOMContentLoaded', function() {
     // Get string from GET-request
-    base64str = window.location.search.substr(1);
-    console.log(base64str);
+    var query = get_query_params(document.location.search);
+    console.log(' ' + query.i);
+    base64 = base64url_to_b64(query.i);
+    console.log('base64 ' + base64);
+    var buffarray = base64DecToArr(base64);
+    console.log('buffarray ' + buffarray);
+    decoded_buffarray = xor_decode(buffarray);
+    var url = UTF8ArrToStr(decoded_buffarray);
+    console.log('url ' + url);
 
-    // TODO: find better function to use to escape any characters with minimum size
-
-    //  Convert from base64 to string in UTF8
-    str = b64_to_utf8(base64str);
-    console.log(str);
-    //document.write (str);
-
-    //  Convert from JSON-sting to object
-    target_obj = JSON.parse(str);
-    // TODO: handle errors here
-
-    console.log(target_obj);
-
-    document.write('<a target="_blank" href="'+target_obj.url+'">'+target_obj.url+'</a>');
+    // document.write('<a target="_blank" href="'+target_obj.url+'">'+target_obj.url+'</a>');
     // TODO: handle redirect errors here
-    window.location.replace(target_obj.url);
+    // window.location.replace(target_obj.url);
     //window.location.href = target_obj.url;
 
 }, false);
