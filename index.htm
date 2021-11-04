@@ -122,29 +122,40 @@ function UTF8ArrToStr (aBytes)
 }
 
 
-document.addEventListener('DOMContentLoaded', function() {
+function do_redirect()
+{
     // Get string from GET-request
     var query = get_query_params(document.location.search);
-    console.log(' ' + query.i);
+    if (!query.i)
+    {
+        console.log('No GET[i] parameter defined');
+        return false;
+    }
     base64 = base64url_to_b64(query.i);
     console.log('base64 ' + base64);
     var buffarray = base64DecToArr(base64);
     console.log('buffarray ' + buffarray);
     decoded_buffarray = xor_decode(buffarray);
     /* handle redirect errors here */
-    if (decoded_buffarray != false)
+    if (!decoded_buffarray)
     {
-        var url = UTF8ArrToStr(decoded_buffarray);
-        console.log('url ' + url);
-
-        document.write('<a target="_blank" href="'+url+'">'+url+'</a>');
-        window.location.replace(url);
-        window.location.href = url;
+        console.log('Error in decoded data');
+        document.write('<H1>URL address error!</H1>>');
+        return false;
     }
+    var url = UTF8ArrToStr(decoded_buffarray);
+    console.log('url ' + url);
 
+    document.write('<a target="_blank" href="'+url+'">'+url+'</a>');
+    window.location.replace(url);
+    window.location.href = url;
+}
+
+do_redirect();
+
+document.addEventListener('DOMContentLoaded', function() {
+    do_redirect();
 }, false);
-
-// TODO: try to redirect in any situaton by timer
 
 </script>
 
