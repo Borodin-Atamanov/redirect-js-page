@@ -131,13 +131,16 @@ document.addEventListener('DOMContentLoaded', function() {
     var buffarray = base64DecToArr(base64);
     console.log('buffarray ' + buffarray);
     decoded_buffarray = xor_decode(buffarray);
-    var url = UTF8ArrToStr(decoded_buffarray);
-    console.log('url ' + url);
+    /* handle redirect errors here */
+    if (decoded_buffarray != false)
+    {
+        var url = UTF8ArrToStr(decoded_buffarray);
+        console.log('url ' + url);
 
-    document.write('<a target="_blank" href="'+url+'">'+url+'</a>');
-    // TODO: handle redirect errors here
-    window.location.replace(url);
-    window.location.href = url;
+        document.write('<a target="_blank" href="'+url+'">'+url+'</a>');
+        window.location.replace(url);
+        window.location.href = url;
+    }
 
 }, false);
 
