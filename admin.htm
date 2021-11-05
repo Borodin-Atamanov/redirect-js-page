@@ -261,7 +261,43 @@ function xor_encode (buffarr8bit)
 }
 
 
+/* TODO replace replaceAll with polyfill
+const replaceAll = ''.replaceAll
+  ? (str, find, rep) => str.replaceAll(find, rep)
+  : (str, find, rep) => {
+    let s = '', index, next;
+    while (~(next = str.indexOf(find, index))) {
+      s += str.substring(index, next) + rep;
+      index = next + find.length;
+    }
+    return s + str.substring(index);
+  }
 
+
+replaceAll = function(string, omit, place, prevstring) {
+  if (prevstring && string === prevstring)
+    return string;
+  prevstring = string.replace(omit, place);
+  return replaceAll(prevstring, omit, place, string)
+}
+
+
+function replaceMulti(haystack, needle, replacement)
+{
+    return haystack.split(needle).join(replacement);
+}
+
+if (!String.prototype.replaceAll) {
+	String.prototype.replaceAll = function (str, newStr){
+
+		// If a string
+		return this.replace(new RegExp(str, 'g'), newStr);
+
+	};
+}
+
+
+*/
 
 
 /*
