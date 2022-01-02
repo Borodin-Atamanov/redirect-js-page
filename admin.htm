@@ -1,6 +1,6 @@
-<!DOCTYPE html><html lang="ru"><head><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>✅Redirect</title><link href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAG//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEQABEAEQAAERAAEQARAAEREAARABEAEQEQABEAEQEQARAAEQAREQABEAARABEQAAEQABEAEREAARAAEQARARABEAARABEAEQEREREAEQABEREREQARAAAQAAAAAAAAAAAAAAAAAAAAD//wAA//8AAP//AAA5ngAAOZwAADmZAAA5kwAAOYcAADmPAAA5hwAAOZMAADmZAAABnAAAAZ4AAP//AAD//wAA" rel="icon" type="image/x-icon" />
-<!-- TODO: add beautiful icon -->
+<!DOCTYPE html><html lang="ru"><head><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>↗️Redirect</title>
 
+<link href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA////AADgBwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEQAAAAAAAAEiEAAAAAAAASIhAAAAAAAAEiIQAAAAAAABIiEAABAAAAASIhABIQAAAAEiIQEiEAAAABIiESIQAAAAASIhIhAAAAAAEiIiEAAAABERIiIQAAABIiIiIhAAAAASIiIiEAAAAAEREREAAAAAAAAAAAD//wAAz/8AAIf/AACD/wAAwf8AAOD3AADwYwAA+CEAAPwBAAD+AQAA/wEAAPwBAAD4AQAA/AEAAP4DAAD//wAA" rel="icon" type="image/x-icon" />
 
 </script>
 
@@ -227,6 +227,7 @@ function b64_to_base64_url (base64url)
     base64 = base64.replaceAll('+','-');
     base64 = base64.replaceAll('/','_');
     base64 = base64.replaceAll('=','.');
+    base64 = base64.replaceAll('.','');
     return base64;
 }
 
@@ -297,7 +298,8 @@ if (!String.prototype.replaceAll) {
 }
 
 
-if (!String.prototype.replaceAll) {
+if (!String.prototype.replaceAll)
+{
 	String.prototype.replaceAll = function(str, newStr){
 
 		// If a regex pattern
@@ -310,9 +312,15 @@ if (!String.prototype.replaceAll) {
 
 	};
 }
-
 */
 
+if (!String.prototype.replaceAll)
+{
+	String.prototype.replaceAll = String.prototype.replaceAll = function(target, replacement)
+	{
+        return this.split(target).join(replacement);
+    };
+}
 
 /*
 function for decode URL
