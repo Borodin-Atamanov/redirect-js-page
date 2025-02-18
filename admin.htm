@@ -2,8 +2,8 @@
 
 <link href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA////AADgBwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEQAAAAAAAAEiEAAAAAAAASIhAAAAAAAAEiIQAAAAAAABIiEAABAAAAASIhABIQAAAAEiIQEiEAAAABIiESIQAAAAASIhIhAAAAAAEiIiEAAAABERIiIQAAABIiIiIhAAAAASIiIiEAAAAAEREREAAAAAAAAAAAD//wAAz/8AAIf/AACD/wAAwf8AAOD3AADwYwAA+CEAAPwBAAD+AQAA/wEAAPwBAAD4AQAA/AEAAP4DAAD//wAA" rel="icon" type="image/x-icon" />
 
-</script>
-
+<!-- https://github.com/LZMA-JS/LZMA-JS -->
+<script src="https://cdn.jsdelivr.net/npm/lzma@2.3.2/src/lzma_worker.min.js"></script>
 
 <style>
 
@@ -85,7 +85,7 @@ a
     *
     {
         color: #000;
-        background-colorcolor: #fff;
+        background-color: #fff;
     }
 }
 
@@ -471,6 +471,7 @@ function fallbackCopyTextToClipboard(text) {
 
   document.body.removeChild(textArea);
 }
+
 function copyTextToClipboard(text) {
   if (!navigator.clipboard) {
     fallbackCopyTextToClipboard(text);
@@ -484,37 +485,32 @@ function copyTextToClipboard(text) {
 }
 
 
-
 function calc()
 {
     //  Generate redirect-code from user input
 
     //  Get target URL from user input
     target_url = document.getElementById("target_url").value;
-    console.log(target_url);
-    //  Convert URL to save format
     //target_url = encodeURI(target_url)
     console.log(target_url);
-    //  Create object with target url
-    // target_obj = {"url":  target_url}
-    // console.log(target_obj);
-    // target_json_str = JSON.stringify(target_obj);
-    // json_str = '{"url":"http://brva.ru/wiki5?123=Приветули🥳"}';
-    // console.log(target_json_str);
-    //  Convert to base64
-    // target_json_b64_str = utf8_to_b64(target_json_str);
-    // target_json_b64_str = window.btoa(target_url);
-
-    // target_b64_str = window.btoa(target_url);
-
-    //  Add char to the start of url string (this char will be changed to checksum soon)
-    target_url = '0' + target_url;
 
     //  convert input string to binary-safe format
     var target_url_buffarray = strToUTF8Arr(target_url);
+    
+    console.log('Target url: ' + target_url_buffarray);
+
+    //  Compress with LZMA
+    target_url_buffarray = LZMA.compress(target_url_buffarray, 9);
+    console.log('Compressed string: ' + target_url_buffarray);
+    
+    var newBuffer = new Uint8Array(target_url_buffarray.length + 1);
+    newBuffer[0] = 0xFF;
+    newBuffer.set(target_url_buffarray, 1);
+    target_url_buffarray = newBuffer;
+    
     encoded_buffarr = xor_encode(target_url_buffarray);
     console.log('Encoded string: ' + encoded_buffarr);
-
+    
     var sMyBase64 = base64EncArr(encoded_buffarr);
     target_b64_str = sMyBase64;
     // target_b64_str = encodeURIComponent(target_b64_str);
@@ -529,6 +525,7 @@ function calc()
 
     /* To decode:
     var aMyUTF8Output = base64DecToArr(sMyBase64);
+    aMyUTF8Output = LZMA.decompress(aMyUTF8Output);
     var sMyOutput = UTF8ArrToStr(aMyUTF8Output);
     */
 }

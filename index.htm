@@ -1,5 +1,10 @@
 <!DOCTYPE html><html lang="ru"><head><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>↗️Redirect</title><link href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA////AADgBwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEQAAAAAAAAEiEAAAAAAAASIhAAAAAAAAEiIQAAAAAAABIiEAABAAAAASIhABIQAAAAEiIQEiEAAAABIiESIQAAAAASIhIhAAAAAAEiIiEAAAABERIiIQAAABIiIiIhAAAAASIiIiEAAAAAEREREAAAAAAAAAAAD//wAAz/8AAIf/AACD/wAAwf8AAOD3AADwYwAA+CEAAPwBAAD+AQAA/wEAAPwBAAD4AQAA/AEAAP4DAAD//wAA" rel="icon" type="image/x-icon" />
+
 <!-- TODO: add beautiful icon -->
+
+<!-- https://github.com/LZMA-JS/LZMA-JS -->
+<script src="https://cdn.jsdelivr.net/npm/lzma@2.3.2/src/lzma_worker.min.js"></script>
+
 
 <script>
 if (!String.prototype.replaceAll)
@@ -94,8 +99,8 @@ function xor_decode (buffarr8bit)
         new_xor = new_xor ^ decoded_buffarray[i];
     }
 
-    console.log('old_xor='+old_xor+' new_xor: '+new_xor);
-    console.log('decoded_buffarray='+decoded_buffarray+'  ');
+    // console.log('old_xor='+old_xor+' new_xor: '+new_xor);
+    // console.log('decoded_buffarray='+decoded_buffarray+'  ');
     //  encoded decoded bufferarray
     if (old_xor == new_xor) return decoded_buffarray;
 
@@ -140,10 +145,13 @@ function do_redirect()
         return false;
     }
     base64 = base64url_to_b64(query.i);
-    console.log('base64 ' + base64);
+    console.log('base64 ' + base64.length);
     var buffarray = base64DecToArr(base64);
-    console.log('buffarray ' + buffarray);
+    console.log('buffarray ' + buffarray.length);
     decoded_buffarray = xor_decode(buffarray);
+    console.log('xor_decode ' + buffarray.length);
+    decoded_buffarray = LZMA.decompress(decoded_buffarray);
+    console.log('LZMA.decompress ' + decoded_buffarray.length);
     /* handle redirect errors here */
     if (!decoded_buffarray)
     {
@@ -151,14 +159,14 @@ function do_redirect()
         document.write('<H1>URL address error!</H1>>');
         return false;
     }
-    var url = UTF8ArrToStr(decoded_buffarray);
-    console.log('url ' + url);
+    // var url = UTF8ArrToStr(decoded_buffarray);
+    var url = decoded_buffarray;
+    console.log('url ' + url.length);
 
     document.write('<a target="_blank" href="'+url+'">'+url+'</a>');
     window.location.replace(url);
     window.location.href = url;
 }
-
 
 setTimeout( function() { do_redirect(); }, 5);
 
@@ -183,7 +191,7 @@ body
     *
     {
         color: #000;
-        background-colorcolor: #fff;
+        background-color: #fff;
     }
     thead
     {
