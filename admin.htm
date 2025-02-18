@@ -464,7 +464,7 @@ function fallbackCopyTextToClipboard(text) {
   try {
     var successful = document.execCommand('copy');
     var msg = successful ? 'successful' : 'unsuccessful';
-    console.log('Fallback: Copying text command was ' + msg);
+    console.log('Fallback: Copying text command was ' + msg.length);
   } catch (err) {
     console.error('Fallback: Oops, unable to copy', err);
   }
@@ -492,16 +492,16 @@ function calc()
     //  Get target URL from user input
     target_url = document.getElementById("target_url").value;
     //target_url = encodeURI(target_url)
-    console.log(target_url);
+    console.log('target_url ' + target_url.length);
 
     //  convert input string to binary-safe format
     var target_url_buffarray = strToUTF8Arr(target_url);
     
-    console.log('Target url: ' + target_url_buffarray);
+    console.log('Target url: ' + target_url_buffarray.length);
 
     //  Compress with LZMA
     target_url_buffarray = LZMA.compress(target_url_buffarray, 9);
-    console.log('Compressed string: ' + target_url_buffarray);
+    console.log('Compressed string: ' + target_url_buffarray.length);
     
     var newBuffer = new Uint8Array(target_url_buffarray.length + 1);
     newBuffer[0] = 0xFF;
@@ -509,14 +509,14 @@ function calc()
     target_url_buffarray = newBuffer;
     
     encoded_buffarr = xor_encode(target_url_buffarray);
-    console.log('Encoded string: ' + encoded_buffarr);
+    console.log('Encoded string: ' + encoded_buffarr.length);
     
     var sMyBase64 = base64EncArr(encoded_buffarr);
     target_b64_str = sMyBase64;
     // target_b64_str = encodeURIComponent(target_b64_str);
     target_b64_str = b64_to_base64_url(target_b64_str);
 
-    console.log(target_b64_str);
+    console.log(target_b64_str.length);
 
     full_result_url = document.getElementById("base_url").value+target_b64_str;
     document.getElementById("result_url").value = full_result_url;

